@@ -1,0 +1,32 @@
+.rectangle {
+
+    background-color: green;
+    height: 200px;
+    width: 400px;
+    transform: rotate(10deg);
+
+}
+
+.rectangle:hover {
+    animation-name: rectangle_flip;
+    animation-duration: 1s;
+
+
+}
+
+@keyframes rectangle_flip {
+
+    from {
+
+        background-color: green;
+        height: 200px;
+        width: 400px;
+    }
+
+
+    to {
+        background-color: green;
+        height: 500px;
+        width: 400px;
+    }
+}

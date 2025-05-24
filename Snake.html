@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Змейка</title>
+    <style>
+        div{
+            display: flex;
+            flex-direction: column;
+            width: 10%;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    
+        <h2 id="Score">Счет: 0 | Рекорд: 0 </h2>
+        <canvas id="Game"></canvas>
+        <div>
+        <button onclick="window.location.href='index.html'">Вернуться</button>
+    </div>
+    <script>
+        let canvas = document.getElementById("Game");
+        let ctx = canvas.getContext("2d");
+        canvas.width = 400;
+        canvas.height = 400;
+
+        const box = 20;
+        let snake = [{ x: 5 * box, y: 5 * box }];
+
+        let food = {
+            x: Math.floor(Math.random() * (canvas.width / box)) * box,
+            y: Math.floor(Math.random() * (canvas.height / box)) * box
+        };
+
+        let dir = "RIGHT";
+        let score = 0;
+        let best = localStorage.getItem("bestScore") || 0;
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft" && dir !== "RIGHT") dir = "LEFT";
+            if (e.key === "ArrowRight" && dir !== "LEFT") dir = "RIGHT";
+            if (e.key === "ArrowUp" && dir !== "DOWN") dir = "UP";
+            if (e.key === "ArrowDown" && dir !== "UP") dir = "DOWN";
+        })
+
+
+        function checkCollicion(head, body) {
+            for (let i = 0; i < body.length; i++) {
+                if (head.x == body[i].x && head.y == body[i].y) return true;
+
+            }
+            return false;
+        }
+
+        function updateScore() {
+            document.getElementById("Score").textContent = `Счет: ${score} | Рекорд: ${best}`;
+        }
+
+
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        canvas.addEventListener("touchstart", function (e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        canvas.addEventListener("touchend", function (e) {
+            let touchEndX = e.changedTouches[0].clientX;
+            let touchEndY = e.changedTouches[0].clientY;
+
+            let dx = touchEndX - touchStartX;
+            let dy = touchEndY - touchStartY;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 0 && dir !== "LEFT") dir = "RIGHT";
+                else if (dx < 0 && dir !== "RIGHT") dir = "LEFT";
+            } else {
+                if (dy > 0 && dir !== "UP") dir = "DOWN";
+                else if (dy < 0 && dir !== "DOWN") dir = "UP";
+            }
+        });
+
+
+
+
+        function draw() {
+            ctx.fillStyle = "#abcbda";
+
+
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = (i === 0) ? "green" : "lime";
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+            }
+
+
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(food.x, food.y, box, box);
+
+            let headX = snake[0].x;
+            let headY = snake[0].y;
+
+            if (dir === "RIGHT") headX += box;
+            if (dir === "LEFT") headX -= box;
+            if (dir === "UP") headY -= box;
+            if (dir === "DOWN") headY += box;
+
+            if (headX == food.x && headY == food.y) {
+                score++;
+                if (score > best) {
+                    best = score;
+                    localStorage.setItem("bestScore", best);
+                }
+
+                food = {
+                    x: Math.floor(Math.random() * (canvas.width / box)) * box,
+                    y: Math.floor(Math.random() * (canvas.height / box)) * box
+                };
+            }
+            else {
+                snake.pop();
+            }
+            updateScore();
+
+            if (headX < -15 || headX > canvas.width || headY < -15 || headY > canvas.height || checkCollicion({ x: headX, y: headY }, snake)) {
+                clearInterval(game);
+                alert("Game Over");
+                location.reload();
+            }
+
+
+
+            let newHead = { x: headX, y: headY };
+            snake.unshift(newHead);
+        }
+        updateScore();
+        let game = setInterval(draw, 200);
+
+
+
+        // Go back button
+
+
+
+
+
+
+
+        /*       if ( ) {
+                   clearInterval(game);
+                   alert("Game Over");
+               }
+       */
+
+
+    </script>
+</body>
+
+</html>
